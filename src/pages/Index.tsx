@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { BottomNavigation } from '@/components/BottomNavigation';
 import { Dashboard } from '@/components/Dashboard';
 import { TransactionsList } from '@/components/TransactionsList';
@@ -41,7 +41,7 @@ const Index = () => {
     deleteCategory 
   } = useCategories();
 
-  const { reminders, dismissReminder } = useReminders(transactions);
+  const { reminders, dismissReminder, hasReminders } = useReminders(transactions);
 
   // Theme is now managed by useTheme hook in Settings
 
@@ -136,10 +136,10 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen gradient-mesh pb-28 lg:pb-8">
+    <div className="min-h-screen gradient-mesh pb-28">
       {/* Header */}
       <header className="sticky top-0 z-40 glass-heavy border-b-0">
-        <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+        <div className="max-w-2xl mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl gradient-primary flex items-center justify-center shadow-glow-sm">
               <span className="text-sm font-bold text-primary-foreground">SF</span>
@@ -149,51 +149,6 @@ const Index = () => {
               <p className="text-[10px] text-muted-foreground -mt-0.5">SiaFlow v1.6</p>
             </div>
           </div>
-
-          {/* Desktop navigation (shows on large screens) */}
-          <div className="hidden lg:flex items-center gap-1 glass-subtle rounded-2xl px-2 py-1">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => handleTabChange('dashboard')}
-              className={activeTab === 'dashboard' && !showCategories ? 'bg-primary/10 text-primary' : ''}
-            >
-              داشبورد
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => handleTabChange('transactions')}
-              className={activeTab === 'transactions' && !showCategories ? 'bg-primary/10 text-primary' : ''}
-            >
-              تراکنش‌ها
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsAddModalOpen(true)}
-              className="mx-1 gradient-primary text-primary-foreground hover:text-primary-foreground"
-            >
-              افزودن
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => handleTabChange('reports')}
-              className={activeTab === 'reports' && !showCategories ? 'bg-primary/10 text-primary' : ''}
-            >
-              گزارش‌ها
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => handleTabChange('settings')}
-              className={activeTab === 'settings' && !showCategories ? 'bg-primary/10 text-primary' : ''}
-            >
-              تنظیمات
-            </Button>
-          </div>
-
           <div className="flex items-center gap-2">
             {activeTab === 'dashboard' && (
               <WidgetSettings
@@ -222,7 +177,7 @@ const Index = () => {
       </header>
 
       {/* Main Content with Page Transitions */}
-      <main className="max-w-6xl mx-auto px-3 sm:px-4 py-4 sm:py-6">
+      <main className="max-w-2xl mx-auto px-3 sm:px-4 py-4 sm:py-5">
         {showCategories ? (
           <div key="categories" className="animate-slide-up">
             <CategoryManagement 

@@ -1,3 +1,14 @@
+
+@font-face {
+    font-family: 'IRANSans';
+    src: local('IRANSans'),
+         local('IranSans'),
+         url('/fonts/IRANSans.woff2') format('woff2'),
+         url('/fonts/IRANSans.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
 #root {
   max-width: 1280px;
   margin: 0 auto;
@@ -39,4 +50,18 @@
 
 .read-the-docs {
   color: #888;
+}
+
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+img, video {
+    max-width: 100%;
+    height: auto;
+}
+
+@media (max-width: 768px) {
+    body {
+        overflow-x: hidden;
+    }
 }

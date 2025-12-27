@@ -17,7 +17,7 @@ const navItems = [
 
 export function BottomNavigation({ activeTab, onTabChange, onAddClick }: BottomNavigationProps) {
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 lg:hidden">
+    <nav className="fixed bottom-0 left-0 right-0 z-50">
       {/* Gradient Fade Background */}
       <div className="absolute inset-0 bg-gradient-to-t from-background via-background/98 to-transparent pointer-events-none h-24" />
       
