@@ -10,19 +10,7 @@ import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 import { EnvWarningBanner } from "./components/EnvWarningBanner";
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      // Sensible defaults for dashboards to avoid noisy refetches.
-      refetchOnWindowFocus: false,
-      retry: 1,
-      staleTime: 30_000,
-    },
-    mutations: {
-      retry: 0,
-    },
-  },
-});
+const queryClient = new QueryClient();
 
 // Initialize theme from localStorage on app load
 function ThemeInitializer() {
@@ -30,29 +18,17 @@ function ThemeInitializer() {
     const stored = localStorage.getItem('app-theme');
     const theme = stored || 'dark';
     
-    const apply = () => {
-      if (theme === 'system') {
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        document.documentElement.classList.toggle('dark', prefersDark);
+    if (theme === 'system') {
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (prefersDark) {
+        document.documentElement.classList.add('dark');
       } else {
-        document.documentElement.classList.toggle('dark', theme === 'dark');
+        document.documentElement.classList.remove('dark');
       }
-    };
-
-    apply();
-
-    // Keep in sync when "system" is selected.
-    const mql = window.matchMedia('(prefers-color-scheme: dark)');
-    const onChange = () => apply();
-    try {
-      mql.addEventListener('change', onChange);
-      return () => mql.removeEventListener('change', onChange);
-    } catch {
-      // Safari fallback
-      // @ts-expect-error - legacy API
-      mql.addListener(onChange);
-      // @ts-expect-error - legacy API
-      return () => mql.removeListener(onChange);
+    } else if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
     }
   }, []);
 
@@ -97,6 +73,8 @@ function AuthRoute({ children }: { children: React.ReactNode }) {
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
+      <div className="min-h-screen overflow-x-hidden">
+        <EnvWarningBanner />
     <TooltipProvider>
       <ThemeInitializer />
       <Toaster />
@@ -125,7 +103,7 @@ const App = () => (
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
-        <EnvWarningBanner />
+        </div>
     </QueryClientProvider>
 );
 

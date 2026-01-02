@@ -108,8 +108,9 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4 relative overflow-hidden">
-      {/* Background decorations */}
+    <PageContainer>
+      <div className="mx-auto w-full max-w-md">
+{/* Background decorations */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-1/2 -right-1/2 w-full h-full bg-gradient-to-bl from-primary/10 via-transparent to-transparent rounded-full blur-3xl" />
         <div className="absolute -bottom-1/2 -left-1/2 w-full h-full bg-gradient-to-tr from-primary/5 via-transparent to-transparent rounded-full blur-3xl" />
@@ -253,8 +254,10 @@ const Auth = () => {
                         >
                           <CheckCircle className={`w-3 h-3 ${checks[i] ? 'opacity-100' : 'opacity-30'}`} />
                           {req}
-                        </div>
-                      );
+                              </div>
+    </PageContainer>
+  );
+
                     })}
                   </div>
                 )}
@@ -306,8 +309,10 @@ const Auth = () => {
           با ورود یا ثبت‌نام، قوانین و شرایط استفاده را می‌پذیرید
         </p>
       </div>
-    </div>
+          </div>
+    </PageContainer>
   );
+
 };
 
 export default Auth;

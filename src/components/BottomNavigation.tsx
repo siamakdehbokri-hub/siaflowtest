@@ -22,7 +22,7 @@ export function BottomNavigation({ activeTab, onTabChange, onAddClick }: BottomN
       <div className="absolute inset-0 bg-gradient-to-t from-background via-background/98 to-transparent pointer-events-none h-24" />
       
       {/* Navigation Container */}
-      <div className="relative glass-heavy rounded-t-[2rem] mx-2 mb-0 pb-safe border-t-0">
+      <div className="relative glass-heavy rounded-t-[2rem] mx-2 mb-0 pb-safe border-t-0 max-w-md md:max-w-md md:mx-auto">
         {/* Subtle top highlight */}
         <div className="absolute top-0 left-4 right-4 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
         

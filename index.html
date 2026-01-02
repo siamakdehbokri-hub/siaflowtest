@@ -24,20 +24,6 @@
         padding-bottom: env(safe-area-inset-bottom, 0);
       }
     </style>
-
-    <script>
-      // Apply theme early to avoid a flash of incorrect theme.
-      (function () {
-        try {
-          var stored = localStorage.getItem('app-theme') || 'dark';
-          var isDark = stored === 'dark';
-          if (stored === 'system') {
-            isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-          }
-          document.documentElement.classList.toggle('dark', !!isDark);
-        } catch (e) {}
-      })();
-    </script>
   </head>
 
   <body>

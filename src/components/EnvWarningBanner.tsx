@@ -7,23 +7,10 @@ export function EnvWarningBanner() {
   if (url && key) return null;
 
   return (
-    <div style={{
-      position: "fixed",
-      left: 12,
-      right: 12,
-      bottom: 12,
-      zIndex: 9999,
-      padding: "10px 12px",
-      borderRadius: 12,
-      background: "rgba(255, 90, 0, 0.12)",
-      border: "1px solid rgba(255, 90, 0, 0.35)",
-      backdropFilter: "blur(8px)",
-      color: "rgba(255,255,255,0.92)",
-      fontSize: 13,
-      lineHeight: 1.35
-    }}>
-      <strong>Missing Supabase env.</strong>{" "}
-      Set <code>VITE_SUPABASE_URL</code> and <code>VITE_SUPABASE_PUBLISHABLE_KEY</code> in your hosting provider (Vercel → Project → Settings → Environment Variables).
+    <div className="fixed left-3 right-3 bottom-3 z-[9999] rounded-xl border border-orange-500/30 bg-orange-500/10 px-3 py-2 text-[13px] text-white/90 backdrop-blur">
+      <span className="font-semibold">Missing Supabase env.</span>{" "}
+      Set <code className="rounded bg-white/10 px-1 py-0.5">VITE_SUPABASE_URL</code> and{" "}
+      <code className="rounded bg-white/10 px-1 py-0.5">VITE_SUPABASE_PUBLISHABLE_KEY</code> in your hosting provider.
     </div>
   );
 }

@@ -21,6 +21,7 @@ import { useReminders } from '@/hooks/useReminders';
 import { Transaction, Category } from '@/types/expense';
 import { FolderOpen, Loader2, PiggyBank, BarChart3, CreditCard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { PageContainer } from "@/components/layout/PageContainer";
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -157,13 +158,14 @@ const Index = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
+    <PageContainer>
+<div className="flex flex-col items-center gap-4">
           <Loader2 className="w-10 h-10 text-primary animate-spin" />
           <p className="text-muted-foreground">در حال بارگذاری...</p>
         </div>
-      </div>
-    );
+          </PageContainer>
+  );
+
   }
 
   return (
@@ -174,7 +176,7 @@ const Index = () => {
         <div className="absolute inset-0 bg-background/70 backdrop-blur-2xl border-b border-border/30" />
         <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent pointer-events-none" />
         
-        <div className="relative max-w-2xl mx-auto px-4 h-14 sm:h-16 flex items-center justify-between">
+        <div className="relative max-w-md mx-auto px-4 h-14 sm:h-16 flex items-center justify-between">
           {/* Logo & Title */}
           <div className="flex items-center gap-3">
             <div className="relative group">
@@ -263,7 +265,7 @@ const Index = () => {
       </header>
 
       {/* Main Content with Smooth Page Transitions */}
-      <main className="max-w-2xl mx-auto px-3 sm:px-4 py-4 sm:py-5">
+      <main className="max-w-md mx-auto px-3 sm:px-4 py-4 sm:py-5">
         <div className="min-h-[60vh]">
           {showCategories ? (
             <div key="categories" className="animate-page-enter">
@@ -366,8 +368,9 @@ const Index = () => {
         onDelete={handleDeleteTransaction}
         categories={categoriesWithSpent}
       />
-    </div>
+        </PageContainer>
   );
+
 };
 
 export default Index;

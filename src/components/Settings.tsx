@@ -108,32 +108,55 @@ export function Settings({ onOpenCategories }: SettingsProps) {
   };
 
   const handleDeleteAccount = async () => {
-    if (deleteConfirmation !== 'حذف حساب') {
-      toast.error('لطفاً عبارت "حذف حساب" را دقیق وارد کنید');
-      return;
-    }
+  if (deleteConfirmation !== 'حذف حساب') {
+    toast.error('لطفاً عبارت "حذف حساب" را دقیق وارد کنید');
+    return;
+  }
 
-    if (!user) return;
+  if (!user) return;
 
-    setDeleting(true);
-    try {
-      const { data, error } = await supabase.functions.invoke('delete-user-account');
-      if (error) throw error;
+  setDeleting(true);
+  try {
+    // Edge Function MUST be deployed in your Supabase project:
+    // supabase functions deploy delete-user-account
+    // supabase secrets set SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=...
+    const { data, error } = await supabase.functions.invoke('delete-user-account', {
+      body: { requestedAt: new Date().toISOString() },
+    });
 
-      // Ensure local session is cleared immediately
-      await supabase.auth.signOut();
+    if (error) throw error;
 
-      toast.success('حساب شما کاملاً حذف شد. برای استفاده دوباره باید ثبت‌نام کنید.');
-      navigate('/auth', { replace: true });
-    } catch (error: any) {
-      console.error('Error deleting account:', error);
+    // Ensure local session is cleared immediately
+    await supabase.auth.signOut();
+
+    toast.success('حساب شما کاملاً حذف شد. برای استفاده دوباره باید ثبت‌نام کنید.');
+    navigate('/auth', { replace: true });
+  } catch (error: any) {
+    console.error('Error deleting account:', error);
+
+    const msg = String(error?.message || '');
+
+    // Common cases when Edge Functions aren't deployed / reachable
+    const looksLikeNotDeployed =
+      msg.includes('404') ||
+      msg.toLowerCase().includes('not found') ||
+      msg.toLowerCase().includes('functions') ||
+      msg.toLowerCase().includes('failed to fetch') ||
+      msg.toLowerCase().includes('fetch');
+
+    if (looksLikeNotDeployed) {
+      toast.error(
+        'حذف حساب فعلاً فعال نیست چون Edge Function روی Supabase دیپلوی نشده. در Supabase: Project → Edge Functions. سپس: supabase functions deploy delete-user-account'
+      );
+    } else {
       toast.error(error?.message || 'خطا در حذف حساب. لطفاً دوباره تلاش کنید.');
-    } finally {
-      setDeleting(false);
-      setShowDeleteDialog(false);
-      setDeleteConfirmation('');
     }
-  };
+  } finally {
+    setDeleting(false);
+    setShowDeleteDialog(false);
+    setDeleteConfirmation('');
+  }
+};
 
   // Sub-views
   if (currentView === 'profile') {
