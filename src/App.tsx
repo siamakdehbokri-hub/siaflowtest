@@ -9,7 +9,19 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      // Sensible defaults for dashboards to avoid noisy refetches.
+      refetchOnWindowFocus: false,
+      retry: 1,
+      staleTime: 30_000,
+    },
+    mutations: {
+      retry: 0,
+    },
+  },
+});
 
 // Initialize theme from localStorage on app load
 function ThemeInitializer() {
@@ -17,17 +29,29 @@ function ThemeInitializer() {
     const stored = localStorage.getItem('app-theme');
     const theme = stored || 'dark';
     
-    if (theme === 'system') {
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      if (prefersDark) {
-        document.documentElement.classList.add('dark');
+    const apply = () => {
+      if (theme === 'system') {
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        document.documentElement.classList.toggle('dark', prefersDark);
       } else {
-        document.documentElement.classList.remove('dark');
+        document.documentElement.classList.toggle('dark', theme === 'dark');
       }
-    } else if (theme === 'dark') {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
+    };
+
+    apply();
+
+    // Keep in sync when "system" is selected.
+    const mql = window.matchMedia('(prefers-color-scheme: dark)');
+    const onChange = () => apply();
+    try {
+      mql.addEventListener('change', onChange);
+      return () => mql.removeEventListener('change', onChange);
+    } catch {
+      // Safari fallback
+      // @ts-expect-error - legacy API
+      mql.addListener(onChange);
+      // @ts-expect-error - legacy API
+      return () => mql.removeListener(onChange);
     }
   }, []);
 
