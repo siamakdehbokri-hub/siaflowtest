@@ -2,16 +2,46 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string | undefined;
+const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string | undefined;
+
+const MISSING_SUPABASE_ENV = !SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY;
+
+if (MISSING_SUPABASE_ENV) {
+  // Don't hard-crash the app in hosted previews (Vercel/GitHub Pages) when env vars aren't configured.
+  // We'll provide a minimal mock client so the UI can render and display a clear warning.
+  // eslint-disable-next-line no-console
+  console.error(
+    '[siaflow] Missing Supabase environment variables. Set VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY in your hosting provider.'
+  );
+}
+
+// A minimal "no-op" client to avoid runtime crashes when env vars are missing.
+// It returns a logged-out state and surfaces errors on auth calls.
+function createSupabaseMock() {
+  const err = new Error('Missing Supabase env: VITE_SUPABASE_URL / VITE_SUPABASE_PUBLISHABLE_KEY');
+  return {
+    auth: {
+      onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
+      getSession: async () => ({ data: { session: null }, error: err }),
+      getUser: async () => ({ data: { user: null }, error: err }),
+      signUp: async () => ({ data: { user: null, session: null }, error: err }),
+      signInWithPassword: async () => ({ data: { user: null, session: null }, error: err }),
+      signOut: async () => ({ error: err }),
+    },
+  } as any;
+}
 
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
 
-export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
-  auth: {
-    storage: localStorage,
-    persistSession: true,
-    autoRefreshToken: true,
-  }
-});
+export const supabase = MISSING_SUPABASE_ENV
+  ? createSupabaseMock()
+  : createClient<Database>(SUPABASE_URL!, SUPABASE_PUBLISHABLE_KEY!, {
+      auth: {
+        autoRefreshToken: true,
+        persistSession: true,
+        detectSessionInUrl: true,
+        storage: localStorage,
+      },
+    });
