@@ -11,6 +11,7 @@ import { WidgetSettings } from '@/components/WidgetSettings';
 import { ReminderNotifications } from '@/components/ReminderNotifications';
 import { SavingGoals } from '@/components/SavingGoals';
 import { DebtManagement } from '@/components/DebtManagement';
+import { loadRecurringTemplates, processRecurringDue } from '@/components/RecurringManager';
 import { MonthlyAnalysis } from '@/components/MonthlyAnalysis';
 import { useTransactions, useCategories } from '@/hooks/useData';
 import { useSavingGoals } from '@/hooks/useSavingGoals';
@@ -157,7 +158,28 @@ const Index = () => {
   const isLoading = transactionsLoading || categoriesLoading || goalsLoading || debtsLoading;
 
   if (isLoading) {
-    return (
+  
+// Auto-create due recurring transactions (mobile-first convenience)
+useEffect(() => {
+  if (!user) return;
+  if (loading) return;
+
+  (async () => {
+    try {
+      const templates = loadRecurringTemplates(user.id);
+      if (templates.length === 0) return;
+      const res = await processRecurringDue(user.id, templates, addTransaction);
+      if (res.created > 0) {
+        // Templates are saved inside manager, but persist here too for safety
+        localStorage.setItem(`siaflow.recurring.v1.${user.id}`, JSON.stringify(res.updated));
+      }
+    } catch {
+      // silent
+    }
+  })();
+}, [user, loading]);
+
+  return (
     <PageContainer>
 <div className="flex flex-col items-center gap-4">
           <Loader2 className="w-10 h-10 text-primary animate-spin" />
@@ -336,7 +358,18 @@ const Index = () => {
               )}
               {activeTab === 'settings' && (
                 <div key="settings" className="animate-page-enter">
-                  <Settings onOpenCategories={() => setShowCategories(true)} />
+                  <Settings
+              onOpenCategories={() => setShowCategories(true)}
+              userId={user?.id}
+              transactions={transactions}
+              categories={categories}
+              goals={goals}
+              debts={debts}
+              addTransaction={addTransaction}
+              addCategory={addCategory}
+              addGoal={addGoal}
+              addDebt={addDebt}
+            />
                 </div>
               )}
             </>

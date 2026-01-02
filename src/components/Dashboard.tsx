@@ -4,6 +4,7 @@ import { SpendingChart } from './SpendingChart';
 import { TrendChart } from './TrendChart';
 import { CategoryBudget } from './CategoryBudget';
 import { MonthlySummary } from './MonthlySummary';
+import { SmartInsights } from './SmartInsights';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Transaction, Category, DashboardWidget } from '@/types/expense';
@@ -43,6 +44,11 @@ export function Dashboard({ transactions, categories, widgets, userName, onViewA
             income={totalIncome}
             expense={totalExpense}
           />
+
+          <div className="animate-slide-up" style={{ animationDelay: `0.15s` }}>
+            <SmartInsights transactions={transactions} />
+          </div>
+
         );
 
       case 'spending-chart':

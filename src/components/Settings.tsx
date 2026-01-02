@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { 
   User, Bell, Shield, Palette, Download, 
   HelpCircle, LogOut, ChevronLeft, Moon, Sun, Monitor, FolderOpen,
-  Trash2, AlertTriangle, Loader2
+  Trash2, AlertTriangle, Loader2, Repeat
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
@@ -12,8 +12,13 @@ import { useTheme } from '@/hooks/useTheme';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { ProfileEdit } from './ProfileEdit';
+import type { Transaction, Category } from '@/types/expense';
+import type { SavingGoal } from '@/hooks/useSavingGoals';
+import type { Debt } from '@/hooks/useDebts';
 import { HelpGuide } from './HelpGuide';
 import { SecuritySettings } from './SecuritySettings';
+import { RecurringManager } from './RecurringManager';
+import { BackupRestore } from './BackupRestore';
 import { supabase } from '@/integrations/supabase/client';
 import {
   Sheet,
@@ -57,15 +62,45 @@ const settingsGroups = [
       { icon: HelpCircle, label: 'راهنما', action: 'help', color: 'text-indigo-500' },
     ],
   },
-];
+
+,
+{
+  title: 'ابزارها',
+  items: [
+    {
+      icon: Repeat,
+      label: 'تراکنش‌های تکرارشونده',
+      description: 'اجاره، قبض، حقوق و… را خودکار کن',
+      action: () => setCurrentView('recurring'),
+    },
+    {
+      icon: Download,
+      label: 'پشتیبان‌گیری و بازیابی',
+      description: 'خروجی JSON/Excel و بازیابی',
+      action: () => setCurrentView('backup'),
+    },
+  ],
+}];
 
 interface SettingsProps {
   onOpenCategories?: () => void;
+  userId?: string;
+
+  // Data for mobile-first tools
+  transactions: Transaction[];
+  categories: Category[];
+  goals: SavingGoal[];
+  debts: Debt[];
+
+  addTransaction: (t: Omit<Transaction, 'id'>) => Promise<void>;
+  addCategory: (c: Omit<Category, 'id'>) => Promise<void>;
+  addGoal: (g: any) => Promise<void>;
+  addDebt: (d: any) => Promise<void>;
 }
 
-type SettingsView = 'main' | 'profile' | 'help' | 'security';
+type SettingsView = 'main' | 'profile' | 'help' | 'security' | 'recurring' | 'backup';
 
-export function Settings({ onOpenCategories }: SettingsProps) {
+export function Settings({ onOpenCategories, userId, transactions, categories, goals, debts, addTransaction, addCategory, addGoal, addDebt }: SettingsProps) {
   const [notifications, setNotifications] = useState(true);
   const [currentView, setCurrentView] = useState<SettingsView>('main');
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -169,7 +204,35 @@ export function Settings({ onOpenCategories }: SettingsProps) {
 
   if (currentView === 'security') {
     return <SecuritySettings onBack={() => setCurrentView('main')} />;
-  }
+  
+if (currentView === 'recurring') {
+  return (
+    <RecurringManager
+      userId={userId}
+      categories={categories}
+      addTransaction={addTransaction}
+      onBack={() => setCurrentView('main')}
+    />
+  );
+}
+
+if (currentView === 'backup') {
+  return (
+    <BackupRestore
+      onBack={() => setCurrentView('main')}
+      transactions={transactions}
+      categories={categories}
+      goals={goals}
+      debts={debts}
+      addTransaction={addTransaction}
+      addCategory={addCategory}
+      addGoal={addGoal}
+      addDebt={addDebt}
+    />
+  );
+}
+
+}
 
   const displayName = user?.user_metadata?.display_name || user?.email?.split('@')[0] || 'کاربر';
   const email = user?.email || '';
